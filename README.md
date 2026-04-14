@@ -35,6 +35,8 @@ It allows you to connect any external issue tracking system (or custom API) to t
 
 ## Expected JSON format
 
+The current implementation expects the JSON objects to contain these exact field names.
+
 The endpoint must return a JSON array like this:
 
 ```json
@@ -87,6 +89,12 @@ regsvr32 SVNBugTraqProvider_x64.dll
 >   * `System32` → 64-bit
 >   * `SysWOW64` → 32-bit
 
+To unregister the DLL:
+
+```bat
+regsvr32 /u SVNBugTraqProvider_x64.dll
+```
+
 ---
 
 ## Configuration in TortoiseSVN
@@ -116,8 +124,6 @@ regsvr32 SVNBugTraqProvider_x64.dll
 ---
 
 ## Commit Window Integration
-
-### 5. Commit window integration
 
 The provider adds an extra **Select issue** button to the TortoiseSVN commit window.
 
@@ -198,13 +204,13 @@ url=https://your-server/api/issues
 
 ## Download
 
-Precompiled binaries are available in the **Releases** section.
+Precompiled binaries are available in the [Releases](../../releases) section.
 
 ---
 
 ## License
 
-Free to use and modify.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
