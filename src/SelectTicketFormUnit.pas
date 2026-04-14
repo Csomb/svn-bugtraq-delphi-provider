@@ -77,13 +77,10 @@ begin
   if Trim(FUrl) = '' then
     raise Exception.Create('Provider URL is not configured.');
 
-  MessageBox(0, 'tabla feltoltes', 'most', 0);
   if not CDS.Active then
     CDS.CreateDataSet
   else
     CDS.EmptyDataSet;
-
-  MessageBox(0, 'adat letoltes', 'most', 0);
 
   S := THttpClientHelper.SimpleGet(FUrl);
 
@@ -129,8 +126,6 @@ end;
 procedure TSelectTicketForm.SetUrl(const Value: string);
 begin
   FUrl := Value;
-
-  MessageBox(0, 'indul a letoltes', 'most', 0);
   LoadTickets;
 end;
 
