@@ -1,35 +1,41 @@
 # SVN BugTraq Delphi Provider
 
-A lightweight TortoiseSVN BugTraq provider implemented in Delphi.
+Delphi-based TortoiseSVN BugTraq provider for custom issue tracker integration.
 
-This project allows you to integrate an external issue tracker (or any HTTP-based source) directly into the TortoiseSVN commit workflow. It enables selecting an issue from a custom endpoint and automatically inserting it into the commit message.
+---
+
+## Overview
+
+This project provides a lightweight BugTraq provider for TortoiseSVN written in Delphi.
+
+It allows you to connect any external issue tracking system (or custom API) to the TortoiseSVN commit workflow. Issues are fetched from an HTTP endpoint and can be selected during commit, then automatically inserted into the commit message.
 
 ---
 
 ## Features
 
-* Integrates with TortoiseSVN BugTraq interface
-* Custom HTTP endpoint support (JSON-based)
+* Integration with TortoiseSVN BugTraq interface
+* Custom HTTP/JSON endpoint support
 * Issue selection dialog with grid view
-* Configurable endpoint URL via TortoiseSVN "Options"
-* Supports both x86 and x64 builds
-* Minimal dependencies (WinInet-based HTTP client)
+* Configurable endpoint URL
+* Minimal dependencies (WinInet-based)
+* Supports x86 and x64 builds
 
 ---
 
 ## How it works
 
-1. TortoiseSVN calls the provider during commit
+1. TortoiseSVN invokes the provider during commit
 2. The provider opens a custom dialog
-3. The dialog fetches issue data from a configured URL
-4. User selects an issue
+3. The dialog loads issues from a configured URL
+4. The user selects an issue
 5. The selected issue is appended to the commit message
 
 ---
 
 ## Expected JSON format
 
-The endpoint must return a JSON array:
+The endpoint must return a JSON array like this:
 
 ```json
 [
@@ -46,11 +52,11 @@ The endpoint must return a JSON array:
 ]
 ```
 
-Required fields:
+### Fields
 
-* `id` → numeric issue ID
-* `desc` → issue title/description
-* `partner` → optional (displayed in grid)
+* `id` → used as SVN **BUGID**
+* `desc` → appended to commit message
+* `partner` → optional, displayed in the grid
 
 ---
 
@@ -67,61 +73,96 @@ Compile the project for both architectures:
 
 ### 2. Register the DLL
 
-Use `regsvr32`:
-
-#### 64-bit:
+The DLL must be registered using `regsvr32` **with administrator privileges**.
 
 ```bat
-regsvr32 YourProvider_x64.dll
+regsvr32 SVNBugTraqProvider_x64.dll
 ```
 
-#### 32-bit:
-
-```bat
-regsvr32 YourProvider_x86.dll
-```
-
-> Important: Use the correct `regsvr32` version:
+> ⚠️ Important:
 >
-> * `System32` → 64-bit
-> * `SysWOW64` → 32-bit
+> * Run command prompt as **Administrator**
+> * Use the correct version of `regsvr32`
+>
+>   * `System32` → 64-bit
+>   * `SysWOW64` → 32-bit
 
 ---
 
-### 3. Configure in TortoiseSVN
+## Configuration in TortoiseSVN
 
-1. Right-click on a working copy folder
-2. Go to:
+### 1. Open context menu
 
-   ```
-   TortoiseSVN → Settings → Issue Tracker Integration
-   ```
-3. Add new provider:
+![Context menu](docs/screenshots/01_context_menu.png)
 
-   * Select your provider from the list
-4. Click **Options**
-5. Enter your endpoint URL
+---
 
-Example:
+### 2. Open Issue Tracker settings
 
-```
-https://your-server/api/issues
-```
+![Issue tracker settings](docs/screenshots/02_settings_tracker.png)
+
+---
+
+### 3. Register the provider
+
+![Register provider](docs/screenshots/03_register_provider.png)
+
+---
+
+### 4. Configure the custom endpoint URL
+
+![Custom URL](docs/screenshots/04_custom_url.png)
+
+---
+
+## Commit Window Integration
+
+### 5. Commit window integration
+
+The provider adds an extra **Select issue** button to the TortoiseSVN commit window.
+
+This screenshot shows where the additional button appears during the commit workflow.
+
+![Commit window](docs/screenshots/05_commit_window.png)
+
+---
+
+## Issue Tracker Integration (Important)
+
+This provider uses the `id` field from the JSON response as the SVN **BUGID** value.
+
+To make issue IDs clickable in commit messages, you must configure TortoiseSVN's built-in BugTraq properties separately.
+
+---
+
+### 6. Add BugTraq integration properties
+
+![Issue tracker integration](docs/screenshots/06_issue_tracker_integration.png)
+
+---
+
+### 7. Configure BugTraq details
+
+![Issue tracker integration details](docs/screenshots/07_issue_tracker_integration_details.png)
+
+---
+
+This configuration is independent from the provider, but required for clickable issue links.
 
 ---
 
 ## Usage
 
 1. Start a commit in TortoiseSVN
-2. Click **"Select issue"**
+2. Click **Select issue**
 3. Choose an item from the list
-4. The issue description will be appended to the commit message
+4. The issue description will be added to the commit message
 
 ---
 
 ## Configuration format
 
-The provider stores settings as a parameter string:
+The provider stores configuration as a parameter string:
 
 ```
 url=https://your-server/api/issues
@@ -131,29 +172,33 @@ url=https://your-server/api/issues
 
 ## Notes
 
-* HTTPS certificates can be ignored (configurable in code)
+* HTTPS certificate validation can be ignored (configurable in code)
 * Network errors will raise exceptions
 * JSON parsing is minimal and expects valid input
-* The UI is intentionally simple and can be customized
+* Designed for simple integrations and custom APIs
 
 ---
 
 ## Limitations
 
-* Only basic JSON parsing (no nested structures)
-* No pagination or filtering (yet)
-* No authentication UI (basic auth supported in code)
+* No advanced JSON parsing (flat structure expected)
+* No pagination or filtering
+* No built-in authentication UI
 
 ---
 
-## Development
-
-### Main components
+## Project structure
 
 * `BugTraqProviderUnit` → COM provider implementation
 * `SelectTicketFormUnit` → issue selection dialog
 * `OptionsUnit` → configuration dialog
-* `HttpClientUnit` → WinInet-based HTTP helper
+* `HttpClientUnit` → HTTP client (WinInet)
+
+---
+
+## Download
+
+Precompiled binaries are available in the **Releases** section.
 
 ---
 
@@ -165,6 +210,6 @@ Free to use and modify.
 
 ## Why this exists
 
-Because integrating a custom issue tracker into TortoiseSVN using Delphi is poorly documented and unnecessarily painful.
+Integrating a custom issue tracker into TortoiseSVN using Delphi is poorly documented and unnecessarily difficult.
 
-This project provides a working example so others don’t have to figure it out from scratch.
+This project provides a working, minimal example so others don’t have to figure it out from scratch.
